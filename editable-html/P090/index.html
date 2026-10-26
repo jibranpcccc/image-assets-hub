@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>P090 Editable Name</title>
+<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Dancing+Script:wght@400..700&family=Cormorant+Garamond:wght@400..700&family=Montserrat:wght@400..900&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#111;color:#fff;font-family:Arial,sans-serif}
+.wrap{max-width:1100px;margin:auto;padding:16px}
+.controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-bottom:14px}
+.controls label{display:block;font-size:12px;opacity:.8;margin-bottom:4px}
+input,select,button{width:100%;padding:8px;border-radius:8px;border:1px solid #444;background:#1c1c1c;color:#fff}
+button{cursor:pointer;background:#7c3aed;border:0;font-weight:700}
+.stage{position:relative;display:inline-block;max-width:100%;box-shadow:0 10px 40px #000}
+.stage img{display:block;max-width:100%;height:auto}
+#name{position:absolute;left:50%;top:62%;transform:translate(-50%,-50%);white-space:nowrap;cursor:move;user-select:none;text-shadow:0 2px 8px rgba(0,0,0,.35)}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>P090 — Editable Name</h1>
+<div class="controls">
+<div><label>Name</label><input id="nameText" value="Your Name"></div>
+<div><label>Font</label><select id="font"><option>Great Vibes</option><option>Playfair Display</option><option>Dancing Script</option><option>Cormorant Garamond</option><option>Montserrat</option></select></div>
+<div><label>Size</label><input id="size" type="range" min="20" max="180" value="72"></div>
+<div><label>Color</label><input id="color" type="color" value="#ffffff"></div>
+<div><label>Letter spacing</label><input id="spacing" type="range" min="-5" max="20" value="0"></div>
+<div><label>Shadow</label><input id="shadow" type="range" min="0" max="30" value="8"></div>
+</div>
+<div class="stage" id="stage">
+<img id="bg" crossorigin="anonymous" src="https://raw.githubusercontent.com/jibranpcccc/image-assets-hub/main/images/P090_main.png" alt="P090 invitation">
+<div id="name">Your Name</div>
+</div>
+<p><button id="download">Download PNG</button></p>
+</div>
+<script>
+const name=document.getElementById('name'),bg=document.getElementById('bg'),stage=document.getElementById('stage');
+function apply(){name.textContent=document.getElementById('nameText').value;name.style.fontFamily="'"+document.getElementById('font').value+"',cursive";name.style.fontSize=document.getElementById('size').value+'px';name.style.color=document.getElementById('color').value;name.style.letterSpacing=document.getElementById('spacing').value+'px';const s=document.getElementById('shadow').value;name.style.textShadow=`0 ${s/3}px ${s}px rgba(0,0,0,.45)`}
+['nameText','font','size','color','spacing','shadow'].forEach(id=>document.getElementById(id).addEventListener('input',apply));
+let drag=false,ox=0,oy=0;name.addEventListener('pointerdown',e=>{drag=true;const r=name.getBoundingClientRect();ox=e.clientX-r.left-r.width/2;oy=e.clientY-r.top-r.height/2;name.setPointerCapture(e.pointerId)});
+name.addEventListener('pointermove',e=>{if(!drag)return;const r=stage.getBoundingClientRect();name.style.left=(e.clientX-r.left-ox)+'px';name.style.top=(e.clientY-r.top-oy)+'px';name.style.transform='translate(-50%,-50%)'});
+name.addEventListener('pointerup',()=>drag=false);
+document.getElementById('download').onclick=()=>{const c=document.createElement('canvas');c.width=bg.naturalWidth;c.height=bg.naturalHeight;const x=c.getContext('2d');x.drawImage(bg,0,0);const sr=stage.getBoundingClientRect(),ir=bg.getBoundingClientRect(),sx=c.width/ir.width,sy=c.height/ir.height,nr=name.getBoundingClientRect();x.font=getComputedStyle(name).font;x.fillStyle=getComputedStyle(name).color;x.textAlign='center';x.textBaseline='middle';const cx=(nr.left+nr.width/2-ir.left)*sx,cy=(nr.top+nr.height/2-ir.top)*sy;x.save();x.shadowColor='rgba(0,0,0,.45)';x.shadowBlur=document.getElementById('shadow').value*sx;x.fillText(name.textContent,cx,cy);x.restore();const a=document.createElement('a');a.download='P090_edited.png';a.href=c.toDataURL('image/png');a.click()};
+apply();
+</script>
+</body>
+</html>
